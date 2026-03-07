@@ -1,0 +1,77 @@
+{
+  "subject": {
+    "name": "Biology",
+    "description": "Core biology concepts for medical entrance exams",
+    "color": "#22c55e",
+    "emoji": "🧬"
+  },
+  "chapters": [
+    {
+      "name": "Chapter 1: Cell Biology",
+      "description": "Structure and function of cells",
+      "questions": [
+        {
+          "question": "Which organelle is known as the powerhouse of the cell?",
+          "options": {
+            "A": "Nucleus",
+            "B": "Mitochondria",
+            "C": "Ribosome",
+            "D": "Golgi apparatus"
+          },
+          "correctAnswer": "B",
+          "explanation": "Mitochondria produce ATP through cellular respiration, providing energy for cell functions."
+        },
+        {
+          "question": "What is the primary function of the cell membrane?",
+          "options": {
+            "A": "Protein synthesis",
+            "B": "Energy production",
+            "C": "Selective permeability and cell boundary",
+            "D": "DNA replication"
+          },
+          "correctAnswer": "C",
+          "explanation": "The cell membrane controls what enters and exits the cell through selective permeability."
+        },
+        {
+          "question": "Which process describes the movement of water across a semipermeable membrane?",
+          "options": {
+            "A": "Diffusion",
+            "B": "Active transport",
+            "C": "Osmosis",
+            "D": "Endocytosis"
+          },
+          "correctAnswer": "C",
+          "explanation": "Osmosis is the passive movement of water from areas of low solute concentration to high solute concentration."
+        }
+      ]
+    },
+    {
+      "name": "Chapter 2: Genetics",
+      "description": "DNA, heredity, and gene expression",
+      "questions": [
+        {
+          "question": "What is the complementary base pair for adenine (A) in DNA?",
+          "options": {
+            "A": "Guanine (G)",
+            "B": "Cytosine (C)",
+            "C": "Uracil (U)",
+            "D": "Thymine (T)"
+          },
+          "correctAnswer": "D",
+          "explanation": "In DNA, adenine pairs with thymine (A-T), and guanine pairs with cytosine (G-C)."
+        },
+        {
+          "question": "Mendel's law of segregation states that:",
+          "options": {
+            "A": "Genes for different traits are inherited independently",
+            "B": "Alleles separate during gamete formation",
+            "C": "Dominant alleles always mask recessive ones",
+            "D": "All offspring are identical to parents"
+          },
+          "correctAnswer": "B",
+          "explanation": "The law of segregation states that each parent passes only one allele for each trait to offspring."
+        }
+      ]
+    }
+  ]
+}
