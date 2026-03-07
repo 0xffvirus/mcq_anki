@@ -33,6 +33,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={spaceGrotesk.variable}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                    // When a new SW is waiting, reload all clients immediately
+                    reg.addEventListener('updatefound', function() {
+                      var newWorker = reg.installing;
+                      newWorker.addEventListener('statechange', function() {
+                        if (newWorker.state === 'activated') {
+                          window.location.reload();
+                        }
+                      });
+                    });
+                  });
+                });
+              }
+            `,
+          }}
+        />
+      </head>
       <body className="antialiased bg-background text-foreground font-sans">
         <div className="mx-auto max-w-[390px] min-h-screen">
           {children}
