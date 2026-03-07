@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Question } from '@/lib/types'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -24,6 +24,15 @@ export function QuestionForm({ open, onClose, onSave, initial }: Props) {
   )
   const [correct, setCorrect] = useState<OptionKey>(initial?.correctAnswer ?? 'A')
   const [explanation, setExplanation] = useState(initial?.explanation ?? '')
+
+  useEffect(() => {
+    if (open) {
+      setQuestionText(initial?.question ?? '')
+      setOptions(initial?.options ?? { A: '', B: '', C: '', D: '' })
+      setCorrect(initial?.correctAnswer ?? 'A')
+      setExplanation(initial?.explanation ?? '')
+    }
+  }, [open, initial])
 
   const setOption = (key: OptionKey, val: string) =>
     setOptions(prev => ({ ...prev, [key]: val }))

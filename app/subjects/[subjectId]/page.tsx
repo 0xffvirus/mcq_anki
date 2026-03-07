@@ -1,12 +1,20 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+  DndContext, closestCenter, PointerSensor, TouchSensor,
+  useSensor, useSensors, DragEndEvent,
+} from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers'
 import { useChapters } from '@/hooks/useChapters'
 import { useSubjects } from '@/hooks/useSubjects'
+import { chapterStorage } from '@/lib/storage'
 import { ChapterCard } from '@/components/chapters/ChapterCard'
 import { ChapterForm } from '@/components/chapters/ChapterForm'
 import { ImportChapterButton } from '@/components/chapters/ImportChapterButton'
 import { SubjectForm } from '@/components/subjects/SubjectForm'
+import { SortableItem } from '@/components/SortableItem'
 import { EmptyState } from '@/components/EmptyState'
 import type { Chapter } from '@/lib/types'
 
@@ -25,6 +33,21 @@ export default function SubjectPage({ params }: Props) {
   const [chapterFormOpen, setChapterFormOpen] = useState(false)
   const [editingChapter, setEditingChapter] = useState<Chapter | undefined>()
   const [subjectFormOpen, setSubjectFormOpen] = useState(false)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(TouchSensor,   { activationConstraint: { delay: 200, tolerance: 8 } }),
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = chapters.findIndex(c => c.id === active.id)
+    const newIndex = chapters.findIndex(c => c.id === over.id)
+    const reordered = arrayMove(chapters, oldIndex, newIndex)
+    chapterStorage.reorder(reordered.map(c => c.id))
+    reload()
+  }
 
   if (!subject) {
     return (
@@ -100,17 +123,31 @@ export default function SubjectPage({ params }: Props) {
             description="Add a chapter to organize your questions"
           />
         ) : (
-          <div className="space-y-3">
-            {chapters.map(chapter => (
-              <ChapterCard
-                key={chapter.id}
-                chapter={chapter}
-                subjectId={subjectId}
-                onEdit={() => { setEditingChapter(chapter); setChapterFormOpen(true) }}
-                onDelete={() => handleDeleteChapter(chapter.id)}
-              />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={chapters.map(c => c.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-3">
+                {chapters.map(chapter => (
+                  <SortableItem key={chapter.id} id={chapter.id}>
+                    {(dragHandleProps, isDragging) => (
+                      <ChapterCard
+                        chapter={chapter}
+                        subjectId={subjectId}
+                        onEdit={() => { setEditingChapter(chapter); setChapterFormOpen(true) }}
+                        onDelete={() => handleDeleteChapter(chapter.id)}
+                        dragHandleProps={dragHandleProps}
+                        isDragging={isDragging}
+                      />
+                    )}
+                  </SortableItem>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 

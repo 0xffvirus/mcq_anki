@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Chapter } from '@/lib/types'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -18,6 +18,13 @@ interface Props {
 export function ChapterForm({ open, onClose, onSave, initial }: Props) {
   const [name, setName] = useState(initial?.name ?? '')
   const [description, setDescription] = useState(initial?.description ?? '')
+
+  useEffect(() => {
+    if (open) {
+      setName(initial?.name ?? '')
+      setDescription(initial?.description ?? '')
+    }
+  }, [open, initial])
 
   const handleSave = () => {
     if (!name.trim()) return

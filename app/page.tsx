@@ -1,15 +1,38 @@
 'use client'
 import { useState } from 'react'
+import {
+  DndContext, closestCenter, PointerSensor, TouchSensor,
+  useSensor, useSensors, DragEndEvent,
+} from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers'
 import { useSubjects } from '@/hooks/useSubjects'
+import { subjectStorage } from '@/lib/storage'
 import { SubjectCard } from '@/components/subjects/SubjectCard'
 import { SubjectForm } from '@/components/subjects/SubjectForm'
 import { ImportButton } from '@/components/subjects/ImportButton'
+import { SortableItem } from '@/components/SortableItem'
 import { EmptyState } from '@/components/EmptyState'
 import type { Subject } from '@/lib/types'
 
 export default function Dashboard() {
   const { subjects, createSubject, reload } = useSubjects()
   const [formOpen, setFormOpen] = useState(false)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(TouchSensor,   { activationConstraint: { delay: 200, tolerance: 8 } }),
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = subjects.findIndex(s => s.id === active.id)
+    const newIndex = subjects.findIndex(s => s.id === over.id)
+    const reordered = arrayMove(subjects, oldIndex, newIndex)
+    subjectStorage.reorder(reordered.map(s => s.id))
+    reload()
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -33,11 +56,24 @@ export default function Dashboard() {
             description="Create a subject or import a JSON file to get started"
           />
         ) : (
-          <div className="space-y-3">
-            {subjects.map(subject => (
-              <SubjectCard key={subject.id} subject={subject} />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={subjects.map(s => s.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-3">
+                {subjects.map(subject => (
+                  <SortableItem key={subject.id} id={subject.id}>
+                    {(dragHandleProps, isDragging) => (
+                      <SubjectCard subject={subject} dragHandleProps={dragHandleProps} isDragging={isDragging} />
+                    )}
+                  </SortableItem>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 

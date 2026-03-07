@@ -50,6 +50,14 @@ export const subjectStorage = {
     const chapters = chapterStorage.getBySubject(id)
     chapters.forEach(c => chapterStorage.delete(c.id))
   },
+  reorder(orderedIds: string[]): void {
+    const all = this.getAll()
+    const map = new Map(all.map(s => [s.id, s]))
+    const reordered = orderedIds.map(id => map.get(id)).filter(Boolean) as Subject[]
+    // Append any subjects not in orderedIds at the end
+    all.forEach(s => { if (!orderedIds.includes(s.id)) reordered.push(s) })
+    setStore(KEYS.subjects, reordered)
+  },
 }
 
 // --- Chapters ---
@@ -82,6 +90,15 @@ export const chapterStorage = {
     setStore(KEYS.chapters, this.getAll().filter(c => c.id !== id))
     const questions = questionStorage.getByChapter(id)
     questions.forEach(q => questionStorage.delete(q.id))
+  },
+  reorder(orderedIds: string[]): void {
+    const all = this.getAll()
+    const map = new Map(all.map(c => [c.id, c]))
+    orderedIds.forEach((id, idx) => {
+      const chapter = map.get(id)
+      if (chapter) map.set(id, { ...chapter, order: idx })
+    })
+    setStore(KEYS.chapters, Array.from(map.values()))
   },
 }
 

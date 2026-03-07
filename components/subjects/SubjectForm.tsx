@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Subject } from '@/lib/types'
 import { randomColor } from '@/lib/utils'
 import {
@@ -23,6 +23,15 @@ export function SubjectForm({ open, onClose, onSave, initial }: Props) {
   const [description, setDescription] = useState(initial?.description ?? '')
   const [emoji, setEmoji] = useState(initial?.emoji ?? '📚')
   const [color, setColor] = useState(initial?.color ?? randomColor())
+
+  useEffect(() => {
+    if (open) {
+      setName(initial?.name ?? '')
+      setDescription(initial?.description ?? '')
+      setEmoji(initial?.emoji ?? '📚')
+      setColor(initial?.color ?? randomColor())
+    }
+  }, [open, initial])
 
   const handleSave = () => {
     if (!name.trim()) return

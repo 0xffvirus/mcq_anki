@@ -8,6 +8,8 @@ import { isMastered } from '@/lib/sm2'
 
 interface Props {
   subject: Subject
+  dragHandleProps?: React.HTMLAttributes<HTMLElement>
+  isDragging?: boolean
 }
 
 function getSubjectStats(subjectId: string) {
@@ -35,38 +37,52 @@ function getSubjectStats(subjectId: string) {
   }
 }
 
-export function SubjectCard({ subject }: Props) {
+export function SubjectCard({ subject, dragHandleProps, isDragging }: Props) {
   const router = useRouter()
   const stats = getSubjectStats(subject.id)
 
   return (
     <div
-      className="bg-card rounded-2xl p-4 flex items-center gap-4 cursor-pointer active:scale-[0.98] transition-transform border border-border"
-      onClick={() => router.push(`/subjects/${subject.id}`)}
+      className={`bg-card rounded-2xl p-4 flex items-center gap-4 border border-border transition-shadow ${isDragging ? 'shadow-2xl shadow-black/60' : ''}`}
     >
+      {/* Drag handle */}
       <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-        style={{ backgroundColor: subject.color + '22' }}
+        {...dragHandleProps}
+        className="touch-none flex-shrink-0 flex flex-col gap-[3px] px-1 py-2 cursor-grab active:cursor-grabbing"
       >
-        {subject.emoji}
+        {[0,1,2].map(i => (
+          <div key={i} className="w-4 h-[2px] rounded-full bg-muted-foreground/40" />
+        ))}
       </div>
 
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-foreground truncate">{subject.name}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {stats.total} cards
-          {stats.due > 0 && (
-            <span className="ml-2 text-amber-400 font-medium">{stats.due} due</span>
-          )}
-        </p>
-      </div>
+      <div
+        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+        onClick={() => router.push(`/subjects/${subject.id}`)}
+      >
+        <div
+          className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+          style={{ backgroundColor: subject.color + '22' }}
+        >
+          {subject.emoji}
+        </div>
 
-      <ProgressRing
-        percent={stats.masteryPercent}
-        size={44}
-        strokeWidth={3}
-        color={subject.color}
-      />
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-foreground truncate">{subject.name}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {stats.total} cards
+            {stats.due > 0 && (
+              <span className="ml-2 text-amber-400 font-medium">{stats.due} due</span>
+            )}
+          </p>
+        </div>
+
+        <ProgressRing
+          percent={stats.masteryPercent}
+          size={44}
+          strokeWidth={3}
+          color={subject.color}
+        />
+      </div>
     </div>
   )
 }
