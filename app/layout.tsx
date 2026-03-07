@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
+import { Space_Grotesk } from "next/font/google";
+
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-sans", weight: ["300", "400", "500", "600", "700"] });
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang="en" className={spaceGrotesk.variable}>
       <body className="antialiased bg-background text-foreground font-sans">
         <div className="mx-auto max-w-[390px] min-h-screen">
           {children}
