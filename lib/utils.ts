@@ -13,9 +13,6 @@ export function now(): string {
   return new Date().toISOString()
 }
 
-export function today(): string {
-  return new Date().toISOString().split('T')[0]
-}
 
 const COLORS = [
   '#6366f1', '#8b5cf6', '#ec4899', '#f97316',
@@ -31,9 +28,3 @@ export function formatDate(isoString: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export function getDaysUntil(isoDateString: string): number {
-  const target = new Date(isoDateString)
-  const now = new Date()
-  const diff = target.getTime() - now.getTime()
-  return Math.ceil(diff / (1000 * 60 * 60 * 24))
-}

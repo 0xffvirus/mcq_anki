@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import type { Subject } from '@/lib/types'
 import { ProgressRing } from '@/components/ProgressRing'
-import { questionStorage, reviewStorage, getQuestionsForReview } from '@/lib/storage'
+import { questionStorage, reviewStorage, getDifficultyCount } from '@/lib/storage'
 import { chapterStorage } from '@/lib/storage'
 import { isMastered } from '@/lib/sm2'
 
@@ -26,7 +26,7 @@ function getSubjectStats(subjectId: string) {
     questions.forEach(q => {
       if (isMastered(reviewMap.get(q.id))) mastered++
     })
-    due += getQuestionsForReview(ch.id).length
+    due += getDifficultyCount(ch.id).due
   })
 
   return {

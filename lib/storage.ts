@@ -148,7 +148,6 @@ export const reviewStorage = {
       easeFactor: 2.5,
       interval: 0,
       repetitions: 0,
-      nextReviewDate: new Date().toISOString().split('T')[0],
       lastReviewed: now(),
     }
     const updated = applyReview(initial, quality)
@@ -163,12 +162,9 @@ export const reviewStorage = {
   },
 }
 
-// --- Due questions ---
-export function getQuestionsForReview(chapterId: string): Question[] {
-  const questions = questionStorage.getByChapter(chapterId)
-  const reviews = reviewStorage.getAll()
-  const reviewMap = new Map(reviews.map(r => [r.questionId, r]))
-  return questions.filter(q => isDue(reviewMap.get(q.id)))
+export function resetChapterReviews(chapterId: string): void {
+  const questionIds = new Set(questionStorage.getByChapter(chapterId).map(q => q.id))
+  setStore(KEYS.reviews, reviewStorage.getAll().filter(r => !questionIds.has(r.questionId)))
 }
 
 export function getQuestionsByFilter(chapterId: string, filter: DifficultyFilter): Question[] {
@@ -178,10 +174,10 @@ export function getQuestionsByFilter(chapterId: string, filter: DifficultyFilter
   const reviews = reviewStorage.getAll()
   const reviewMap = new Map(reviews.map(r => [r.questionId, r]))
 
-  if (filter === 'due') return questions.filter(q => isDue(reviewMap.get(q.id)))
+  if (filter === 'due')   return questions.filter(q => isDue(reviewMap.get(q.id)))
   if (filter === 'again') return questions.filter(q => reviewMap.get(q.id)?.lastQuality === 0)
-  if (filter === 'hard') return questions.filter(q => reviewMap.get(q.id)?.lastQuality === 3)
-  if (filter === 'good') return questions.filter(q => reviewMap.get(q.id)?.lastQuality === 5)
+  if (filter === 'hard')  return questions.filter(q => reviewMap.get(q.id)?.lastQuality === 3)
+  if (filter === 'good')  return questions.filter(q => reviewMap.get(q.id)?.lastQuality === 5)
   return questions
 }
 
@@ -190,24 +186,12 @@ export function getDifficultyCount(chapterId: string) {
   const reviews = reviewStorage.getAll()
   const reviewMap = new Map(reviews.map(r => [r.questionId, r]))
   return {
-    due: questions.filter(q => isDue(reviewMap.get(q.id))).length,
+    due:   questions.filter(q => isDue(reviewMap.get(q.id))).length,
     again: questions.filter(q => reviewMap.get(q.id)?.lastQuality === 0).length,
-    hard: questions.filter(q => reviewMap.get(q.id)?.lastQuality === 3).length,
-    good: questions.filter(q => reviewMap.get(q.id)?.lastQuality === 5).length,
-    all: questions.length,
+    hard:  questions.filter(q => reviewMap.get(q.id)?.lastQuality === 3).length,
+    good:  questions.filter(q => reviewMap.get(q.id)?.lastQuality === 5).length,
+    all:   questions.length,
   }
-}
-
-export function getNextReviewDate(chapterId: string): string | null {
-  const questions = questionStorage.getByChapter(chapterId)
-  if (questions.length === 0) return null
-  const reviews = reviewStorage.getAll()
-  const reviewMap = new Map(reviews.map(r => [r.questionId, r]))
-  const dates = questions
-    .map(q => reviewMap.get(q.id)?.nextReviewDate)
-    .filter(Boolean) as string[]
-  if (dates.length === 0) return null
-  return dates.sort()[0]
 }
 
 // --- Import ---

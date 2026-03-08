@@ -39,7 +39,6 @@ export interface ReviewRecord {
   easeFactor: number
   interval: number
   repetitions: number
-  nextReviewDate: string
   lastReviewed: string
   lastQuality?: Quality
 }

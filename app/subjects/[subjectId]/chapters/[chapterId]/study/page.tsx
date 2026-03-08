@@ -45,7 +45,7 @@ export default function StudyPage({ params }: Props) {
         <EmptyState
           icon="✅"
           title="No cards here"
-          description={filter === 'due' ? 'Nothing due today. Come back later.' : `No cards rated as "${filter}" yet.`}
+          description={filter === 'due' ? 'All questions have been reviewed.' : `No cards rated as "${filter}" yet.`}
           action={
             <Button variant="outline" onClick={() => router.back()}>
               Go Back

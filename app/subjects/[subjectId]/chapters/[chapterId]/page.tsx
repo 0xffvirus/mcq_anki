@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuestions } from '@/hooks/useQuestions'
-import { chapterStorage, getDifficultyCount } from '@/lib/storage'
+import { chapterStorage, getDifficultyCount, resetChapterReviews } from '@/lib/storage'
 import { QuestionCard } from '@/components/questions/QuestionCard'
 import { QuestionForm } from '@/components/questions/QuestionForm'
 import { EmptyState } from '@/components/EmptyState'
@@ -30,9 +30,17 @@ export default function ChapterPage({ params }: Props) {
   const [formOpen, setFormOpen] = useState(false)
   const [editingQuestion, setEditingQuestion] = useState<Question | undefined>()
   const [filter, setFilter] = useState<DifficultyFilter>('due')
+  const [tick, setTick] = useState(0)
 
-  const counts = getDifficultyCount(chapterId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const counts = useMemo(() => getDifficultyCount(chapterId), [chapterId, tick])
   const selectedCount = counts[filter]
+
+  const handleReset = () => {
+    if (!confirm('Reset all progress for this chapter? This cannot be undone.')) return
+    resetChapterReviews(chapterId)
+    setTick(t => t + 1)
+  }
 
   if (!chapter) {
     return (
@@ -100,6 +108,14 @@ export default function ChapterPage({ params }: Props) {
       <div className="flex-1 px-4 pb-24">
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium text-muted-foreground">{questions.length} questions</p>
+          {questions.length > 0 && (
+            <button
+              onClick={handleReset}
+              className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+            >
+              Reset progress
+            </button>
+          )}
         </div>
 
         {questions.length === 0 ? (

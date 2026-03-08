@@ -19,23 +19,18 @@ export function ChapterCard({ chapter, subjectId, onEdit, onDelete, dragHandlePr
   const reviews = reviewStorage.getAll()
   const reviewMap = new Map(reviews.map(r => [r.questionId, r]))
 
-  const again  = questions.filter(q => reviewMap.get(q.id)?.lastQuality === 0).length
-  const hard   = questions.filter(q => reviewMap.get(q.id)?.lastQuality === 3).length
-  const good   = questions.filter(q => reviewMap.get(q.id)?.lastQuality === 5).length
-  const due    = questions.filter(q => {
-    const r = reviewMap.get(q.id)
-    return !r || (r.nextReviewDate <= new Date().toISOString().split('T')[0] && r.lastQuality === undefined)
-  }).length
-  // unreviewed = never touched
+  const again      = questions.filter(q => reviewMap.get(q.id)?.lastQuality === 0).length
+  const hard       = questions.filter(q => reviewMap.get(q.id)?.lastQuality === 3).length
+  const good       = questions.filter(q => reviewMap.get(q.id)?.lastQuality === 5).length
   const unreviewed = questions.filter(q => !reviewMap.get(q.id)).length
 
   const pct = (n: number) => total > 0 ? (n / total) * 100 : 0
 
   const segments = [
-    { value: pct(due + unreviewed), color: '#f59e0b' },  // amber - due/new
-    { value: pct(again),            color: '#ef4444' },  // red - again
-    { value: pct(hard),             color: '#f97316' },  // orange - hard
-    { value: pct(good),             color: '#22c55e' },  // green - good
+    { value: pct(unreviewed), color: '#f59e0b' },  // amber - new/unreviewed
+    { value: pct(again),      color: '#ef4444' },  // red - again
+    { value: pct(hard),       color: '#f97316' },  // orange - hard
+    { value: pct(good),       color: '#22c55e' },  // green - good
   ]
 
   return (
