@@ -48,33 +48,39 @@ export default function Dashboard() {
       </div>
 
       {/* Subject List */}
-      <div className="flex-1 px-4 pb-24">
-        {subjects.length === 0 ? (
-          <EmptyState
-            icon="📚"
-            title="No subjects yet"
-            description="Create a subject or import a JSON file to get started"
-          />
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext items={subjects.map(s => s.id)} strategy={verticalListSortingStrategy}>
-              <div className="space-y-3">
-                {subjects.map(subject => (
-                  <SortableItem key={subject.id} id={subject.id}>
-                    {(dragHandleProps, isDragging) => (
-                      <SubjectCard subject={subject} dragHandleProps={dragHandleProps} isDragging={isDragging} />
-                    )}
-                  </SortableItem>
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
+      <div className="flex-1 px-4 pb-24 flex flex-col">
+        <div className="flex-1">
+          {subjects.length === 0 ? (
+            <EmptyState
+              icon="📚"
+              title="No subjects yet"
+              description="Create a subject or import a JSON file to get started"
+            />
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={subjects.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-3">
+                  {subjects.map(subject => (
+                    <SortableItem key={subject.id} id={subject.id}>
+                      {(dragHandleProps, isDragging) => (
+                        <SubjectCard subject={subject} dragHandleProps={dragHandleProps} isDragging={isDragging} />
+                      )}
+                    </SortableItem>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
+
+        <div className="pt-6 text-center text-xs text-muted-foreground">
+          Made by Bahaa
+        </div>
       </div>
 
       {/* FAB */}
